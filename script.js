@@ -7,6 +7,8 @@ const solutionDialog=document.getElementById("solutionDialog"),solutionBoard=doc
 const PROGRESS_KEY="boxworld_completed_levels_v1";
 const UNLOCK_ALL_KEY="boxworld_all_levels_unlocked_v1";
 const secretDialog=document.getElementById("secretDialog");
+const cheatDialog=document.getElementById("cheatDialog");
+let wallCheatEnabled=false,wallModifierHeld=false;
 let allLevelsUnlocked=localStorage.getItem(UNLOCK_ALL_KEY)==="1";
 // Altere esta senha para outra de sua preferência.
 const SOLUTION_PASSWORD="5847";
@@ -37,13 +39,13 @@ function drawBoard(target,source,clickable=false){
 }
 function render(){drawBoard(board,state,true);movesEl.textContent=moves;pushesEl.textContent=pushes;}
 function save(){history.push({state:clone(state),moves,pushes});if(history.length>1000)history.shift();}
-function step(dx,dy,fromSolution=false){
+function step(dx,dy,fromSolution=false,throughWall=false){
  if(won)return false;
  if(!fromSolution)stopSolution();
  const x=state.player%WIDTH,y=Math.floor(state.player/WIDTH),nx=x+dx,ny=y+dy;
  if(nx<0||nx>=WIDTH||ny<0||ny>=HEIGHT)return false;
  const next=ny*WIDTH+nx;
- if(state.terrain[next]===1||state.terrain[next]===0)return false;
+ if(!throughWall&&(state.terrain[next]===1||state.terrain[next]===0))return false;
  const box=state.boxes.has(next),after=(ny+dy)*WIDTH+(nx+dx);
  if(box){
   if(nx+dx<0||nx+dx>=WIDTH||ny+dy<0||ny+dy>=HEIGHT)return false;
@@ -76,12 +78,38 @@ function startSolution(){
 function advanceSolution(){if(solutionIndex>=solutionMoves.length)return;applySolutionMove(solutionState,solutionMoves[solutionIndex++]);renderSolutionPreview();}
 function playSolutionPreview(){if(playTimer!==null){stopSolution();return;}if(solutionIndex>=solutionMoves.length){solutionIndex=0;solutionState=parseLevel(LEVELS[current]);renderSolutionPreview();}document.getElementById("solutionPlayBtn").textContent="■ Pausar";const tick=()=>{if(!solutionDialog.open||solutionIndex>=solutionMoves.length){stopSolution();return;}advanceSolution();playTimer=setTimeout(tick,220);};tick();}
 
-function showSecretDialog(){
+function showCheatDialog(){
  if(document.querySelector("dialog[open]"))return;
- document.getElementById("secretError").textContent="";
- document.getElementById("secretPasswordInput").value="";
- secretDialog.showModal();
- document.getElementById("secretPasswordInput").focus();
+ document.getElementById("cheatError").textContent="";
+ document.getElementById("cheatCodeInput").value="";
+ cheatDialog.showModal();
+ document.getElementById("cheatCodeInput").focus();
+}
+function applyCheat(code){
+ const normalized=code.trim().toLowerCase();
+ if(normalized==="#bw01"){
+  cheatDialog.close(); startSolution(); return;
+ }
+ if(normalized==="#bw02"){
+  allLevelsUnlocked=true;
+  try{localStorage.setItem(UNLOCK_ALL_KEY,"1");}catch(_){}
+  renderLevels(); updateNavigation();
+  document.getElementById("cheatError").textContent="";
+  cheatDialog.close(); message.textContent="Todas as fases foram desbloqueadas."; return;
+ }
+ if(normalized==="#bw03"){
+  allLevelsUnlocked=false;
+  try{localStorage.setItem(UNLOCK_ALL_KEY,"0");}catch(_){}
+  renderLevels(); updateNavigation();
+  if(current>highestUnlocked())loadLevel(highestUnlocked());
+  cheatDialog.close(); message.textContent="Fases bloqueadas novamente. Seu progresso concluído foi mantido."; return;
+ }
+ if(normalized==="#bw04"){
+  wallCheatEnabled=true;
+  cheatDialog.close(); message.textContent="Trapaça ativada."; return;
+ }
+ document.getElementById("cheatError").textContent="Código inválido.";
+ document.getElementById("cheatCodeInput").select();
 }
 function exportProgress(){
  const data={format:"boxworld-save",version:1,savedAt:new Date().toISOString(),completed:[...completed].sort((a,b)=>a-b),allLevelsUnlocked,currentLevel:current};
@@ -115,7 +143,14 @@ function importProgressFile(file){
 document.getElementById("importSaveInput").addEventListener("change",e=>importProgressFile(e.target.files[0]));
 document.addEventListener("keydown",e=>{
  const key=e.key.toLowerCase();
- if(e.ctrlKey && ["r","z","b","m","l","s","i","a","j","k"].includes(key)){
+ if(e.altKey && key==="z"){wallModifierHeld=true;e.preventDefault();return;}
+ if(e.ctrlKey && e.altKey && key==="c"){
+  e.preventDefault(); e.stopPropagation(); if(!e.repeat)showCheatDialog(); return;
+ }
+ if(wallCheatEnabled && e.altKey && wallModifierHeld && dirs[e.key]){
+  e.preventDefault(); e.stopPropagation(); if(!e.repeat)step(...dirs[e.key],false,true); return;
+ }
+ if(e.ctrlKey && ["r","z","b","m","s","i","a"].includes(key)){
   e.preventDefault();e.stopPropagation();
   if(e.repeat)return;
   if(key==="a"){
@@ -126,20 +161,11 @@ document.addEventListener("keydown",e=>{
    if(!document.querySelector("dialog[open]"))document.getElementById("importSaveInput").click();
    return;
   }
-  if(key==="j"||key==="k"){
-   if(!document.querySelector("dialog[open]")){
-    document.getElementById("secretMode").value=key==="k"?"unlock":"lock";
-    document.querySelector("#secretDialog .dlg-title").childNodes[0].textContent=key==="k"?"Desbloquear fases ":"Bloquear fases ";
-    showSecretDialog();
-   }
-   return;
-  }
   if(document.querySelector("dialog[open]"))return;
   if(key==="r")restart();
   else if(key==="z")undo();
   else if(key==="b"){if(current>0)loadLevel(current-1);}
   else if(key==="m"){if(current<highestUnlocked())loadLevel(current+1);}
-  else if(key==="l")playSolution();
   else if(key==="s")exportProgress();
   return;
  }
@@ -151,7 +177,8 @@ document.addEventListener("keydown",e=>{
  }
  if(document.querySelector("dialog[open]"))return;
  if(dirs[e.key]){e.preventDefault();step(...dirs[e.key]);}
-});
+ });
+document.addEventListener("keyup",e=>{if(e.key.toLowerCase()==="z")wallModifierHeld=false;});
 document.getElementById("levelsMenu").onclick=()=>levelDialog.showModal();
 document.getElementById("helpMenu").onclick=()=>helpDialog.showModal();
 document.getElementById("gameMenu").onclick=()=>gameDialog.showModal();
@@ -171,6 +198,9 @@ document.getElementById("secretForm").addEventListener("submit",e=>{
  secretDialog.close();renderLevels();updateNavigation();
  if(current>highestUnlocked())loadLevel(highestUnlocked());
  message.textContent=allLevelsUnlocked?"Todas as fases foram desbloqueadas.":"Desbloqueio por senha desativado. Seu progresso normal foi mantido.";
+});
+document.getElementById("cheatForm").addEventListener("submit",e=>{
+ e.preventDefault(); applyCheat(document.getElementById("cheatCodeInput").value);
 });
 document.getElementById("passwordForm").addEventListener("submit",e=>{
  e.preventDefault();
