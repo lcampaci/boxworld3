@@ -1,0 +1,38 @@
+BOXWORLD — 100 fases originais (recriação HTML/CSS/JS)
+=======================================================
+
+Esta versão usa o arquivo boxworld.chm extraído e enviado pelo usuário.
+Foram aproveitados os 100 arrays originais de tabuleiro (1.htm até 100.htm),
+as soluções A associadas (1.js até 100.js) e os GIFs originais das peças.
+
+Executar:
+1. Extraia o ZIP inteiro para uma pasta.
+2. Abra index.html no navegador.
+3. As imagens ficam reunidas na pasta imagens. Não mova nem renomeie essa pasta ou levels.js.
+
+Alterações desta versão:
+- Todas as imagens ficam juntas na pasta imagens/.
+- Fundo preto no tabuleiro e no fundo da página.
+- Fases bloqueadas até concluir a fase anterior; progresso salvo no navegador.
+- A solução exige senha. Senha atual: 5847.
+
+Controles:
+- Setas ou W/A/S/D: mover
+- Ctrl + R: reiniciar fase
+- Ctrl + Z: desfazer somente a última jogada
+- Ctrl + B: fase anterior
+- Ctrl + N: próxima fase, quando estiver liberada
+- Ctrl + S: ver solução
+- Fases: são desbloqueadas em sequência. O progresso fica salvo neste navegador.
+- Ver solução: pede senha antes de reproduzir a solução guardada.
+
+Atenção:
+O tabuleiro e os sprites foram recuperados dos arquivos enviados. A moldura e os controles foram recriados em HTML/CSS; portanto, a interface geral não é uma cópia pixel a pixel do site antigo. As fases e os gráficos são muito mais próximos do original que nas versões anteriores.
+
+Novidades desta versão:
+- O menu Jogo abre uma janela modal no mesmo estilo das outras opções, sem usar prompt.
+- Nova aba Sobre com data desta versão, autor, e-mail e referência ao Box World original.
+- PWA: manifest, ícones de instalação e service worker para uso offline após a primeira abertura.
+- Para instalar, abra o jogo por HTTPS ou por localhost; abrir o arquivo index.html diretamente (file://) não permite instalação PWA. Em um servidor compatível, use o botão Instalar quando aparecer ou o menu de instalação do navegador.
+
+Referência histórica: Box World, criado por Jeng-Long Jiang e lançado para Windows em 1992. A mecânica faz parte da tradição de jogos do tipo Sokoban, criado por Hiroyuki Imabayashi / Thinking Rabbit em 1981.

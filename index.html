@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BoxWorld — Original 100 fases</title>
+<meta name="theme-color" content="#000080">
+<meta name="description" content="Recriação de BoxWorld com 100 fases clássicas, funcionamento offline e instalação como aplicativo.">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./imagens/icon-192.png">
+<link rel="apple-touch-icon" href="./imagens/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="window">
+  <header class="titlebar"><img src="./imagens/3.gif" alt="" class="appicon"><strong>BoxWorld</strong><span class="grow"></span><button class="sys">_</button><button class="sys">□</button><button class="sys">×</button></header>
+  <nav class="menubar"><button id="gameMenu">Jogo</button><button id="levelsMenu">Fases</button><button id="helpMenu">Ajuda</button><button id="aboutMenu">Sobre</button><button id="installBtn" hidden>Instalar</button></nav>
+  <section class="content">
+    <div class="top"><label>Fase <b id="levelNum">1</b> / 100</label><label>Movimentos: <b id="moves">0</b></label><label>Empurrões: <b id="pushes">0</b></label></div>
+    <div class="board-shell"><div id="board" aria-label="Tabuleiro BoxWorld"></div></div>
+    <div class="message" id="message">Empurre todas as caixas para os alvos.</div>
+  </section>
+  <footer><span id="statusLevel">Fase 1</span><span>Setas / WASD para mover · atalhos em Ajuda</span></footer>
+</main>
+<dialog id="gameDialog"><div class="dlg-title">Jogo <button data-close="gameDialog">×</button></div><div class="dlg-content game-options"><button id="menuRestart">⟲ Reiniciar fase</button><button id="menuUndo">↶ Desfazer movimento</button><button id="menuSolution">▶ Ver solução</button><button data-close="gameDialog">Cancelar</button></div></dialog>
+<dialog id="passwordDialog"><div class="dlg-title">Ver solução <button data-close="passwordDialog">×</button></div><form id="passwordForm" class="dlg-content"><label for="solutionPasswordInput">Digite a senha para mostrar a solução:</label><input id="solutionPasswordInput" type="password" autocomplete="current-password" required><p id="passwordError" class="error-text" role="alert"></p><div class="dialog-actions"><button type="button" data-close="passwordDialog">Cancelar</button><button type="submit">Confirmar</button></div></form></dialog>
+<dialog id="secretDialog"><div class="dlg-title"><span id="secretTitle">Desbloquear fases</span><button data-close="secretDialog">×</button></div><form id="secretForm" class="dlg-content"><input id="secretMode" type="hidden" value="unlock"><label for="secretPasswordInput">Digite a senha:</label><input id="secretPasswordInput" type="password" autocomplete="off" required><p id="secretError" class="error-text" role="alert"></p><div class="dialog-actions"><button type="button" data-close="secretDialog">Cancelar</button><button type="submit">Confirmar</button></div></form></dialog>
+<dialog id="solutionDialog" class="solution-dialog"><div class="dlg-title">Solução da fase <span id="solutionLevelLabel"></span><button data-close="solutionDialog">×</button></div><div class="solution-preview"><div id="solutionBoard" aria-label="Prévia da solução"></div></div><div class="solution-controls"><span id="solutionStepLabel">Passo 0</span><button id="solutionPlayBtn">▶ Reproduzir</button><button id="solutionPrevBtn">◀ Voltar</button><button id="solutionNextBtn">Avançar ▶</button><button data-close="solutionDialog">Fechar</button></div><p class="solution-hint">Esta é uma prévia independente. Seus movimentos e a fase atual não serão alterados.</p></dialog>
+<dialog id="aboutDialog"><div class="dlg-title">Sobre o BoxWorld <button data-close="aboutDialog">×</button></div><div class="dlg-content about-content"><h3>BoxWorld — Recriação clássica</h3><p><strong>Data desta versão:</strong> 13 de outubro de 2026</p><p><strong>Criador desta versão:</strong> Luis Henrique Campaci</p><p><strong>E-mail:</strong> <a href="mailto:luiscampaci@hotmail.com.br">luiscampaci@hotmail.com.br</a></p><hr><p><strong>Jogo original:</strong> Box World</p><p><strong>Criador do original:</strong> Jeng-Long Jiang</p><p><strong>Ano de lançamento:</strong> 1992 (Windows)</p><p class="about-note">Esta versão é uma recriação em HTML, CSS e JavaScript, utilizando referências encontrados na internet.
+<br>Links de referência:
+<br><a href="http://www.boxworld.matsel.de/index.php">http://www.boxworld.matsel.de/index.php</a>
+<br><a href="https://sokoban.dk/articles/boxworld/">https://sokoban.dk/articles/boxworld/</a>
+<br><a href="https://archive.org/details/win3_BOXWORLD">https://archive.org/details/win3_BOXWORLD</a>
+<br>
+Box World é baseado no estilo de quebra-cabeça Sokoban, criado por Hiroyuki Imabayashi e publicado pela Thinking Rabbit em 1981.</p></div></dialog>
+<dialog id="levelDialog"><div class="dlg-title">Selecionar fase <button data-close="levelDialog">×</button></div><div id="levelGrid"></div></dialog>
+<dialog id="helpDialog"><div class="dlg-title">Ajuda <button data-close="helpDialog">×</button></div><div class="dlg-content"><p>Coloque todas as caixas sobre os alvos amarelos.</p><p>Use as setas ou W/A/S/D para mover.</p><p><strong>Atalhos do teclado:</strong></p><ul><li><strong>Ctrl + R:</strong> reiniciar a fase</li><li><strong>Ctrl + Z:</strong> desfazer somente o último movimento</li><li><strong>Ctrl + B:</strong> fase anterior</li><li><strong>Ctrl + M:</strong> próxima fase (quando estiver liberada)</li><li><strong>Ctrl + A:</strong> abrir esta tela de ajuda</li></ul><p>As fases são desbloqueadas em sequência: conclua uma fase para liberar a próxima.</p></div></dialog>
+<dialog id="winDialog"><div class="dlg-title">Fase concluída! <button data-close="winDialog">×</button></div><div class="dlg-content"><p>Todos os alvos foram preenchidos.</p><button id="winNext">Próxima fase ▶</button></div></dialog>
+<input id="importSaveInput" type="file" accept=".json,application/json" hidden><script src="levels.js"></script><script src="script.js"></script>
+</body></html>
