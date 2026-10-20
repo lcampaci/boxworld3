@@ -141,12 +141,17 @@ function importProgressFile(file){
  reader.readAsText(file);
 }
 document.getElementById("importSaveInput").addEventListener("change",e=>importProgressFile(e.target.files[0]));
-document.addEventListener("keydown",e=>{
+// O atalho secreto é capturado na fase de captura para funcionar mesmo quando
+// o foco está em um elemento do jogo. Usa e.code para não depender do layout do teclado.
+window.addEventListener("keydown",e=>{
  const key=e.key.toLowerCase();
- if(e.altKey && key==="z"){wallModifierHeld=true;e.preventDefault();return;}
- if(e.ctrlKey && e.altKey && key==="c"){
-  e.preventDefault(); e.stopPropagation(); if(!e.repeat)showCheatDialog(); return;
+ if(e.ctrlKey && e.altKey && (e.code==="KeyC" || key==="c" || e.keyCode===67)){
+  e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+  if(!e.repeat)showCheatDialog();
+  return;
  }
+
+ if(e.altKey && key==="z"){wallModifierHeld=true;e.preventDefault();return;}
  if(wallCheatEnabled && e.altKey && wallModifierHeld && dirs[e.key]){
   e.preventDefault(); e.stopPropagation(); if(!e.repeat)step(...dirs[e.key],false,true); return;
  }
@@ -177,7 +182,7 @@ document.addEventListener("keydown",e=>{
  }
  if(document.querySelector("dialog[open]"))return;
  if(dirs[e.key]){e.preventDefault();step(...dirs[e.key]);}
- });
+ }, true);
 document.addEventListener("keyup",e=>{if(e.key.toLowerCase()==="z")wallModifierHeld=false;});
 document.getElementById("levelsMenu").onclick=()=>levelDialog.showModal();
 document.getElementById("helpMenu").onclick=()=>helpDialog.showModal();

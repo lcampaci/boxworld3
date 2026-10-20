@@ -1,5 +1,5 @@
 'use strict';
-const CACHE_NAME = 'boxworld-pwa-v7';
+const CACHE_NAME = 'boxworld-pwa-v8';
 const APP_FILES = [
   './', './index.html', './style.css', './script.js', './levels.js', './manifest.json',
   './imagens/0.gif', './imagens/1.gif', './imagens/2.gif', './imagens/3.gif',
