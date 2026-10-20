@@ -1,0 +1,20 @@
+BOXWORLD
+Manual rápido
+
+OBJETIVO
+Leve todas as caixas até as posições marcadas no cenário.
+
+COMO JOGAR
+- Use as teclas de direção do teclado para movimentar o personagem.
+- Caminhe pelo cenário e empurre as caixas até os locais indicados.
+- Planeje os movimentos antes de empurrar uma caixa: normalmente, você pode empurrá-la, mas não puxá-la.
+- Evite encurralar caixas em cantos ou contra paredes sem uma saída.
+- Quando todas as caixas estiverem nos locais corretos, a fase será concluída.
+
+DICAS
+- Observe o cenário antes de começar.
+- Pense alguns movimentos à frente.
+- Se uma caixa ficar presa, talvez seja necessário reiniciar a fase ou tentar outra estratégia.
+- Avance pelas fases resolvendo um desafio de cada vez.
+
+BOM JOGO!
