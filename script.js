@@ -105,8 +105,13 @@ function applyCheat(code){
   cheatDialog.close(); message.textContent="Fases bloqueadas novamente. Seu progresso concluído foi mantido."; return;
  }
  if(normalized==="#bw04"){
-  wallCheatEnabled=true;
-  cheatDialog.close(); message.textContent="Trapaça ativada."; return;
+  wallCheatEnabled=!wallCheatEnabled;
+  wallModifierHeld=false;
+  cheatDialog.close();
+  message.textContent=wallCheatEnabled
+   ? "Trapaça de atravessar paredes ativada. Digite #bw04 novamente para desativar."
+   : "Trapaça de atravessar paredes desativada.";
+  return;
  }
  document.getElementById("cheatError").textContent="Código inválido.";
  document.getElementById("cheatCodeInput").select();
