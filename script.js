@@ -167,9 +167,16 @@ function importProgressFile(file){
 document.getElementById("importSaveInput").addEventListener("change",e=>importProgressFile(e.target.files[0]));
 // O atalho secreto é capturado na fase de captura para funcionar mesmo quando
 // o foco está em um elemento do jogo. Usa e.code para não depender do layout do teclado.
+// Atalho de trapaças: captura antes dos demais controles e considera
+// variações de teclado/layout comuns em notebooks (incluindo AltGr).
 window.addEventListener("keydown",e=>{
- const key=e.key.toLowerCase();
- if(e.ctrlKey && e.altKey && (e.code==="KeyC" || key==="c" || e.keyCode===67)){
+ const key=String(e.key||"").toLowerCase();
+ const altGraph = typeof e.getModifierState === "function" && e.getModifierState("AltGraph");
+ const isCKey = e.code==="KeyC" || key==="c" || key==="ç" || e.keyCode===67;
+ const primaryCheatShortcut = isCKey && e.ctrlKey && (e.altKey || altGraph);
+ // Alternativa para notebooks em que o sistema/driver intercepta Ctrl+Alt+C.
+ const notebookFallbackShortcut = isCKey && e.ctrlKey && e.shiftKey;
+ if(primaryCheatShortcut || notebookFallbackShortcut){
   e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
   if(!e.repeat)showCheatDialog();
   return;
@@ -238,7 +245,7 @@ document.getElementById("secretForm").addEventListener("submit",e=>{
  secretDialog.close();renderLevels();updateNavigation();
  if(current>highestUnlocked())loadLevel(highestUnlocked());
  message.textContent=allLevelsUnlocked?"Todas as fases foram desbloqueadas.":"Desbloqueio por senha desativado. Seu progresso normal foi mantido.";
-});
+}, true);
 document.getElementById("cheatForm").addEventListener("submit",e=>{
  e.preventDefault(); applyCheat(document.getElementById("cheatCodeInput").value);
 });
