@@ -9,6 +9,7 @@ const UNLOCK_ALL_KEY="boxworld_all_levels_unlocked_v1";
 const secretDialog=document.getElementById("secretDialog");
 const cheatDialog=document.getElementById("cheatDialog");
 let wallCheatEnabled=false,wallModifierHeld=false;
+let teleportCheatEnabled=false,teleportClickArmed=false;
 let allLevelsUnlocked=localStorage.getItem(UNLOCK_ALL_KEY)==="1";
 // Altere esta senha para outra de sua preferência.
 const SOLUTION_PASSWORD="5847";
@@ -33,7 +34,14 @@ function drawBoard(target,source,clickable=false){
  for(let i=0;i<WIDTH*HEIGHT;i++){
   let v=source.terrain[i];if(source.player===i)v=source.goals.has(i)?6:5;else if(source.boxes.has(i))v=source.goals.has(i)?4:3;
   const img=document.createElement("img");img.className="tile";img.alt="";img.draggable=false;img.src=tileSprite(v);img.dataset.index=i;
-  if(clickable)img.addEventListener("click",()=>{const d=i-state.player;if(d===-WIDTH)step(0,-1);else if(d===WIDTH)step(0,1);else if(d===-1&&Math.floor(i/WIDTH)===Math.floor(state.player/WIDTH))step(-1,0);else if(d===1&&Math.floor(i/WIDTH)===Math.floor(state.player/WIDTH))step(1,0);});
+  if(clickable)img.addEventListener("click",()=>{
+   if(teleportCheatEnabled&&teleportClickArmed){
+    teleportClickArmed=false;
+    if(i!==state.player){save();state.player=i;moves++;won=false;if(winDialog.open)winDialog.close();render();checkWin();message.textContent="Bonequinho teleportado para a posição escolhida.";}
+    return;
+   }
+   const d=i-state.player;if(d===-WIDTH)step(0,-1);else if(d===WIDTH)step(0,1);else if(d===-1&&Math.floor(i/WIDTH)===Math.floor(state.player/WIDTH))step(-1,0);else if(d===1&&Math.floor(i/WIDTH)===Math.floor(state.player/WIDTH))step(1,0);
+  });
   fragment.appendChild(img);
  }target.appendChild(fragment);
 }
@@ -115,6 +123,15 @@ function applyCheat(code){
    : "Trapaça de atravessar paredes desativada.";
   return;
  }
+ if(normalized==="#bw05"){
+  teleportCheatEnabled=!teleportCheatEnabled;
+  teleportClickArmed=false;
+  cheatDialog.close();
+  message.textContent=teleportCheatEnabled
+   ? "Trapaça #bw05 ativada. Pressione ESC e clique no tabuleiro para teleportar o bonequinho. Digite #bw05 novamente para desativar."
+   : "Trapaça #bw05 desativada.";
+  return;
+ }
  document.getElementById("cheatError").textContent="Código inválido.";
  document.getElementById("cheatCodeInput").select();
 }
@@ -158,6 +175,9 @@ window.addEventListener("keydown",e=>{
   return;
  }
 
+ if(teleportCheatEnabled && e.key==="Escape" && !document.querySelector("dialog[open]")){
+  teleportClickArmed=true;e.preventDefault();e.stopPropagation();return;
+ }
  if(e.altKey && key==="z"){wallModifierHeld=true;e.preventDefault();return;}
  if(wallCheatEnabled && e.altKey && wallModifierHeld && dirs[e.key]){
   e.preventDefault(); e.stopPropagation(); if(!e.repeat)step(...dirs[e.key],false,true); return;
