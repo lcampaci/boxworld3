@@ -191,11 +191,19 @@ window.addEventListener("keydown",e=>{
 document.addEventListener("keyup",e=>{if(e.key.toLowerCase()==="z")wallModifierHeld=false;});
 document.getElementById("levelsMenu").onclick=()=>levelDialog.showModal();
 document.getElementById("helpMenu").onclick=()=>helpDialog.showModal();
-document.getElementById("gameMenu").onclick=()=>gameDialog.showModal();
+const gameMenuWrap=document.getElementById("gameMenuWrap");
+const gameMenuButton=document.getElementById("gameMenu");
+const gameDropdown=document.getElementById("gameDropdown");
+function closeGameMenu(){gameDropdown.classList.remove("open");gameMenuButton.setAttribute("aria-expanded","false");}
+gameMenuWrap.addEventListener("mouseenter",()=>{gameDropdown.classList.add("open");gameMenuButton.setAttribute("aria-expanded","true");});
+gameMenuWrap.addEventListener("mouseleave",closeGameMenu);
+gameMenuButton.addEventListener("click",()=>{const open=!gameDropdown.classList.contains("open");gameDropdown.classList.toggle("open",open);gameMenuButton.setAttribute("aria-expanded",String(open));});
+document.addEventListener("click",e=>{if(!gameMenuWrap.contains(e.target))closeGameMenu();});
+document.getElementById("menuSaveProgress").onclick=()=>{closeGameMenu();exportProgress();};
+document.getElementById("menuImportProgress").onclick=()=>{closeGameMenu();document.getElementById("importSaveInput").click();};
 document.getElementById("aboutMenu").onclick=()=>aboutDialog.showModal();
-document.getElementById("menuRestart").onclick=()=>{gameDialog.close();if(confirm("Reiniciar a fase "+(current+1)+"?"))restart();};
-document.getElementById("menuUndo").onclick=()=>{gameDialog.close();undo();};
-document.getElementById("menuSolution").onclick=()=>{gameDialog.close();playSolution();};
+document.getElementById("menuRestart").onclick=()=>{closeGameMenu();if(confirm("Reiniciar a fase "+(current+1)+"?"))restart();};
+document.getElementById("menuUndo").onclick=()=>{closeGameMenu();undo();};
 document.getElementById("secretForm").addEventListener("submit",e=>{
  e.preventDefault();
  const input=document.getElementById("secretPasswordInput");
