@@ -31,7 +31,7 @@ function tileSprite(v){return "./imagens/"+v+".gif";}
 function drawBoard(target,source,clickable=false){
  target.innerHTML="";const fragment=document.createDocumentFragment();
  for(let i=0;i<WIDTH*HEIGHT;i++){
-  let v=source.terrain[i];if(source.boxes.has(i))v=source.goals.has(i)?4:3;else if(source.player===i)v=source.goals.has(i)?6:5;
+  let v=source.terrain[i];if(source.player===i)v=source.goals.has(i)?6:5;else if(source.boxes.has(i))v=source.goals.has(i)?4:3;
   const img=document.createElement("img");img.className="tile";img.alt="";img.draggable=false;img.src=tileSprite(v);img.dataset.index=i;
   if(clickable)img.addEventListener("click",()=>{const d=i-state.player;if(d===-WIDTH)step(0,-1);else if(d===WIDTH)step(0,1);else if(d===-1&&Math.floor(i/WIDTH)===Math.floor(state.player/WIDTH))step(-1,0);else if(d===1&&Math.floor(i/WIDTH)===Math.floor(state.player/WIDTH))step(1,0);});
   fragment.appendChild(img);
@@ -47,6 +47,8 @@ function step(dx,dy,fromSolution=false,throughWall=false){
  const next=ny*WIDTH+nx;
  if(!throughWall&&(state.terrain[next]===1||state.terrain[next]===0))return false;
  const box=state.boxes.has(next),after=(ny+dy)*WIDTH+(nx+dx);
+ // Na trapaça, atravessa caixas sem empurrá-las; a caixa permanece no lugar.
+ if(box&&throughWall){save();state.player=next;moves++;render();return true;}
  if(box){
   if(nx+dx<0||nx+dx>=WIDTH||ny+dy<0||ny+dy>=HEIGHT)return false;
   if(state.terrain[after]===0||state.terrain[after]===1||state.boxes.has(after))return false;
