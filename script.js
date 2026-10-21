@@ -185,7 +185,14 @@ window.addEventListener("keydown",e=>{
  if(teleportCheatEnabled && e.key==="Escape" && !document.querySelector("dialog[open]")){
   teleportClickArmed=true;e.preventDefault();e.stopPropagation();return;
  }
- if(e.altKey && key==="z"){wallModifierHeld=true;e.preventDefault();return;}
+ // Atalho para visualizar a solução: Ctrl+L abre a confirmação de senha.
+  // Impede que o navegador use Ctrl+L para focar a barra de endereços.
+  if(e.ctrlKey && key==="l"){
+   e.preventDefault();e.stopPropagation();
+   if(!e.repeat && !document.querySelector("dialog[open]"))startSolution();
+   return;
+  }
+  if(e.altKey && key==="z"){wallModifierHeld=true;e.preventDefault();return;}
  if(wallCheatEnabled && e.altKey && wallModifierHeld && dirs[e.key]){
   e.preventDefault(); e.stopPropagation(); if(!e.repeat)step(...dirs[e.key],false,true); return;
  }
